@@ -31,14 +31,14 @@
   --radius:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--pb-navy);color:var(--pb-ink);font-family:var(--pb-font);-webkit-font-smoothing:antialiased}
-body{overflow-x:hidden}
+html,body{height:100%;background:var(--pb-navy);color:var(--pb-ink);font-family:var(--pb-font);-webkit-font-smoothing:antialiased}
+body{overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--pb-accent-2);outline-offset:3px;border-radius:6px}
 
 /* ---------- Shell ---------- */
-.pbmap{position:relative;width:100%;height:clamp(600px, 100vh, 800px);overflow:hidden;
+.pbmap{position:relative;width:100%;height:100%;min-height:520px;overflow:hidden;
   background:
     radial-gradient(1200px 700px at 72% 55%, rgba(230,69,122,.10), transparent 60%),
     radial-gradient(900px 600px at 20% 10%, rgba(43,72,98,.45), transparent 60%),
@@ -158,15 +158,23 @@ a{color:inherit}
 
 /* ---------- Mobile: map on top, panel below ---------- */
 @media (max-width: 860px){
-  .pbmap{height:auto;overflow:visible}
-  .stage{position:relative;height:440px;inset:auto}
-  .head{position:relative;top:auto;left:auto;max-width:none;padding:24px 16px 0}
-  .panel{position:relative;inset:auto;width:auto;margin:12px 16px 16px}
-  .list{max-height:none}
+  /* Fill the iframe as a column: heading, then map, then a panel whose list scrolls on its own */
+  .pbmap{display:flex;flex-direction:column;height:100%;min-height:0}
+  .head{position:relative;top:auto;left:auto;max-width:none;padding:18px 16px 12px;flex:0 0 auto}
+  .wrap-stage{position:relative;flex:1 1 46%;min-height:200px;overflow:hidden}
+  .stage{position:absolute;inset:0;height:auto}
+  /* panel scrolls as one piece (list then detail) with a sticky header, so the detail never squeezes the list */
+  .panel{position:relative;inset:auto;width:auto;margin:0 12px 12px;flex:1 1 54%;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .panel-head{position:sticky;top:0;z-index:2;background:rgba(29,51,70,.96);backdrop-filter:blur(16px)}
+  .list{flex:0 0 auto;overflow:visible;max-height:none}
+  .detail{position:sticky;bottom:0;background:#14263a;box-shadow:0 -14px 28px rgba(8,16,24,.55)}
   .tip{display:none}
   /* phones: only the current or tapped office keeps its name chip; the list below names them all */
   .pin:not(.is-current):not(.is-active) .label{opacity:0}
-  .wrap-stage{position:relative;overflow:hidden}
+}
+/* Very short frames: hide the heading so map + list still fit */
+@media (max-width: 860px) and (max-height: 620px){
+  .head{display:none}
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
